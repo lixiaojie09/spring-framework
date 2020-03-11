@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2019 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.function.Consumer;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -156,7 +157,8 @@ public interface ServerRequest {
 	Map<String, Object> attributes();
 
 	/**
-	 * Get the first parameter with the given name, if present.
+	 * Get the first parameter with the given name, if present. Servlet
+	 * parameters are contained in the query string or posted form data.
 	 * @param name the parameter name
 	 * @return the parameter value
 	 * @see HttpServletRequest#getParameter(String)
@@ -176,7 +178,8 @@ public interface ServerRequest {
 	}
 
 	/**
-	 * Get all parameters for this request.
+	 * Get all parameters for this request. Servlet parameters are contained
+	 * in the query string or posted form data.
 	 * @see HttpServletRequest#getParameterMap()
 	 */
 	MultiValueMap<String, String> params();
@@ -303,6 +306,18 @@ public interface ServerRequest {
 		 * @param headerName the header name
 		 */
 		List<String> header(String headerName);
+
+		/**
+		 * Get the first header value, if any, for the header for the given name.
+		 * <p>Returns {@code null} if no header values are found.
+		 * @param headerName the header name
+		 * @since 5.2.5
+		 */
+		@Nullable
+		default String firstHeader(String headerName) {
+			List<String> list = header(headerName);
+			return list.isEmpty() ? null : list.get(0);
+		}
 
 		/**
 		 * Get the headers as an instance of {@link HttpHeaders}.
